@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Apex Halo · Flash Guition</title>
+  <style>
+    :root{--bg:#050608;--panel:#101217;--panel2:#151820;--line:#252a34;--text:#f4f4f4;--muted:#8a8f98;--red:#e10600;--green:#00d26a;--orange:#ffb000;--blue:#27a6ff}
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    html,body{margin:0;width:100%;height:100%;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif;overflow:hidden}
+    body{background:radial-gradient(circle at 50% -20%,rgba(225,6,0,.22),transparent 38%),linear-gradient(135deg,#11141a,#020203 72%)}
+    .wrap{width:100vw;height:100vh;display:grid;place-items:center;padding:14px}
+    .screen{width:min(100vw,800px);height:min(100vh,480px);border:1px solid #2a2f3a;background:linear-gradient(90deg,rgba(255,255,255,.026) 1px,transparent 1px),linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),var(--bg);background-size:20px 20px;display:grid;grid-template-rows:62px 1fr;overflow:hidden}
+    header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;border-bottom:1px solid var(--line);position:relative;background:rgba(5,6,8,.94)}
+    header:after{content:"";position:absolute;left:18px;right:18px;bottom:-1px;height:2px;background:linear-gradient(90deg,var(--red),transparent 75%)}
+    .brand{display:flex;align-items:center;gap:12px;min-width:0}.mark{width:42px;height:20px;position:relative;flex:0 0 auto}.mark:before,.mark:after{content:"";position:absolute;height:7px;background:var(--red);transform:skewX(-25deg)}.mark:before{width:42px;top:0;left:0}.mark:after{width:25px;bottom:0;left:9px}
+    h1{font-size:18px;letter-spacing:.12em;text-transform:uppercase;margin:0;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pill{font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.08em;padding:8px 10px;border-radius:999px;border:1px solid rgba(255,176,0,.38);color:var(--orange);background:rgba(255,176,0,.08);white-space:nowrap}
+    main{padding:14px;display:grid;grid-template-columns:1fr 1fr;gap:14px;min-height:0}.card{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:16px;padding:16px;position:relative;overflow:hidden;min-height:0}.card:before{content:"";position:absolute;left:0;top:16px;width:4px;height:24px;border-radius:0 99px 99px 0;background:var(--red)}
+    h2{font-size:24px;line-height:.95;text-transform:uppercase;letter-spacing:-.05em;margin:0 0 12px;font-weight:900}.sub{color:var(--muted);font-size:11px;line-height:1.35;font-weight:800;margin-bottom:14px}.grid{display:grid;gap:10px}.step{display:grid;grid-template-columns:34px 1fr;gap:10px;align-items:start;border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.025);border-radius:12px;padding:10px}.num{width:28px;height:28px;border-radius:9px;background:rgba(225,6,0,.14);border:1px solid rgba(225,6,0,.42);display:grid;place-items:center;color:#fff;font-weight:900;font-size:13px}.txt{font-size:12px;font-weight:900;line-height:1.2}.txt small{display:block;color:var(--muted);font-size:9px;font-weight:800;margin-top:4px;line-height:1.25}
+    .actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}button,a.btn{border:1px solid var(--line);background:#0c0e13;color:var(--text);border-radius:12px;padding:13px 10px;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.06em;text-align:center;text-decoration:none;cursor:pointer}button.primary,a.primary{border-color:rgba(0,210,106,.38);background:rgba(0,210,106,.08);color:var(--green)}button.warn,a.warn{border-color:rgba(255,176,0,.38);background:rgba(255,176,0,.08);color:var(--orange)}button.red{border-color:rgba(225,6,0,.45);background:rgba(225,6,0,.10);color:#ffb8b4}
+    .status{margin-top:12px;border:1px solid rgba(255,255,255,.07);background:rgba(0,0,0,.24);border-radius:12px;padding:12px;font-size:11px;font-weight:900;line-height:1.35;min-height:70px;color:var(--muted)}.ok{color:var(--green)}.bad{color:#ff6f67}.info{color:var(--blue)}code{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);border-radius:7px;padding:2px 5px;color:#fff}.bar{height:8px;border-radius:999px;background:#0b0d12;border:1px solid rgba(255,255,255,.07);overflow:hidden;margin-top:10px}.fill{height:100%;width:0%;background:linear-gradient(90deg,var(--red),var(--orange),var(--green));transition:width .2s ease}.small-title{font-size:10px;color:var(--muted);font-weight:900;text-transform:uppercase;letter-spacing:.14em;margin-bottom:8px}.danger{color:#ffb8b4}
+    @media(max-width:799px),(max-height:479px){.screen{transform:scale(min(calc(100vw / 800),calc(100vh / 480)));transform-origin:center;width:800px;height:480px}}
+  </style>
+</head>
+<body>
+  <div class="wrap"><section class="screen">
+    <header><div class="brand"><span class="mark"></span><h1>Apex Halo · Flash Guition</h1></div><span class="pill">ESP32-S3 · 7 pouces</span></header>
+    <main>
+      <article class="card">
+        <h2>Mode flash</h2>
+        <p class="sub">Page de préparation pour flasher ton Guition. Le flash direct depuis navigateur marche seulement avec Chrome/Edge et Web Serial. Sinon utilise ESP Flash Download Tool ou PlatformIO.</p>
+        <div class="grid">
+          <div class="step"><span class="num">1</span><span class="txt">Branche le Guition en USB<small>Utilise un câble USB data, pas juste recharge.</small></span></div>
+          <div class="step"><span class="num">2</span><span class="txt">Passe-le en mode boot si besoin<small>Maintiens BOOT, appuie sur RESET, relâche RESET puis BOOT.</small></span></div>
+          <div class="step"><span class="num">3</span><span class="txt">Choisis le port série<small>Le navigateur demandera COM3, COM4, USB Serial, CH340 ou CP210x.</small></span></div>
+          <div class="step"><span class="num">4</span><span class="txt">Flash le firmware<small>Il faudra ajouter les fichiers .bin quand le firmware LVGL sera prêt.</small></span></div>
+        </div>
+        <div class="actions">
+          <button class="primary" id="btnSerial">Tester port série</button>
+          <button class="warn" id="btnBoot">Checklist boot</button>
+          <a class="btn" href="/">Retour app</a>
+          <button class="red" id="btnFull">Plein écran</button>
+        </div>
+      </article>
+
+      <article class="card">
+        <h2>Diagnostic</h2>
+        <div class="small-title">État navigateur</div>
+        <div class="status" id="status">Prêt. Clique sur <code>Tester port série</code> pour vérifier si Chrome peut voir le Guition.</div>
+        <div class="bar"><div class="fill" id="fill"></div></div>
+        <div class="grid" style="margin-top:12px">
+          <div class="step"><span class="num">A</span><span class="txt">URL app<small><code id="appUrl">http://localhost:3000</code></small></span></div>
+          <div class="step"><span class="num">B</span><span class="txt">Résolution cible<small>800 × 480 · mode paysage · tactile capacitif conseillé.</small></span></div>
+          <div class="step"><span class="num">C</span><span class="txt">Firmware attendu<small class="danger">À faire : build ESP32-S3 / LVGL / écran RGB 7 pouces.</small></span></div>
+        </div>
+        <div class="actions">
+          <button id="btnApi">Tester serveur local</button>
+          <button id="btnResolution">Tester 800×480</button>
+        </div>
+      </article>
+    </main>
+  </section></div>
+<script>
+const $=id=>document.getElementById(id);const status=$('status');const fill=$('fill');
+function log(html,type='info',pct=0){status.innerHTML=html;status.className='status '+type;fill.style.width=pct+'%'}
+$('appUrl').textContent=location.origin;
+$('btnSerial').onclick=async()=>{if(!('serial'in navigator)){log('Web Serial indisponible. Utilise Chrome ou Edge récent, pas Firefox/Safari.','bad',15);return}try{log('Sélectionne le port USB du Guition dans la fenêtre Chrome...','info',35);const port=await navigator.serial.requestPort();log('Port série détecté ✅<br>Le navigateur peut communiquer avec le Guition. Prochaine étape : ajouter les fichiers firmware .bin et la logique de flash.','ok',70);try{await port.close()}catch{}}catch(e){log('Aucun port choisi ou accès refusé.<br><small>'+e.message+'</small>','bad',20)}};
+$('btnBoot').onclick=()=>log('Checklist boot :<br>1. Débranche/rebranche USB<br>2. Maintiens <code>BOOT</code><br>3. Appuie sur <code>RESET</code><br>4. Relâche RESET puis BOOT<br>5. Relance le test port série','info',45);
+$('btnFull').onclick=async()=>{try{if(!document.fullscreenElement)await document.documentElement.requestFullscreen();else await document.exitFullscreen();log('Plein écran OK.','ok',100)}catch(e){log('Plein écran refusé par le navigateur.','bad',20)}};
+$('btnApi').onclick=async()=>{try{const r=await fetch('/api/status',{cache:'no-store'});const j=await r.json();log('Serveur local OK ✅<br><code>'+j.time+'</code><br>Cache : '+j.cacheSize,'ok',100)}catch(e){log('Serveur local non détecté. Lance <code>npm start</code> puis ouvre <code>http://localhost:3000/flash.html</code>.','bad',10)}};
+$('btnResolution').onclick=()=>{const w=innerWidth,h=innerHeight;const ok=Math.abs(w-800)<80&&Math.abs(h-480)<80;log('Taille fenêtre actuelle : <code>'+w+'×'+h+'</code><br>'+ (ok?'Proche du 800×480 ✅':'Pas en 800×480. Mets le navigateur en plein écran ou teste sur le Guition.'),ok?'ok':'info',ok?100:50)};
+</script>
+</body>
+</html>
