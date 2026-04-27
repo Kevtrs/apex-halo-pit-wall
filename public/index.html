@@ -329,7 +329,8 @@
     };
 
     const $ = id => document.getElementById(id);
-    const pad = n => String(n).padStart(2, "0");
+    const pad  = n => String(n).padStart(2, "0");
+    const pos  = n => String(n); // positions: 1, 2, 3 sans zero-padding
 
     const trackShapes = [
       "M42 96 C60 35,128 24,162 54 C190 78,234 34,260 72 C286 112,214 126,168 105 C122 84,96 128,42 96",
@@ -386,15 +387,16 @@
 
     function teamColor(team = "") {
       const key = normalizeTeamKey(team);
-      if (key.includes("ferrari")) return "#E80020";
-      if (key.includes("mclaren")) return "#FF8000";
-      if (key.includes("red_bull")) return "#3671C6";
-      if (key.includes("mercedes")) return "#27F4D2";
-      if (key.includes("aston")) return "#229971";
-      if (key.includes("alpine")) return "#0093CC";
-      if (key.includes("williams")) return "#64C4FF";
-      if (key.includes("haas")) return "#B6BABD";
-      if (key.includes("racing_bulls") || key.includes("visa") || key.includes("rb")) return "#6692FF";
+      if (key.includes("ferrari"))    return "#E80020";
+      if (key.includes("mclaren"))    return "#FF8000";
+      if (key.includes("red_bull"))   return "#3671C6";
+      if (key.includes("mercedes"))   return "#27F4D2";
+      if (key.includes("aston"))      return "#229971";
+      if (key.includes("alpine"))     return "#0093CC";
+      if (key.includes("williams"))   return "#64C4FF";
+      if (key.includes("haas"))       return "#B6BABD";
+      // FIX: "racing_bulls" avant "rb_f1" pour eviter faux positifs sur "rb" seul
+      if (key.includes("racing_bulls") || key.includes("visa") || key.includes("rb_f1")) return "#6692FF";
       if (key.includes("audi") || key.includes("revolut") || key.includes("sauber") || key.includes("kick")) return "audi";
       return "#B6BABD";
     }
@@ -512,9 +514,19 @@
         ANT:["Andrea Kimi Antonelli","Mercedes","#27F4D2"], TSU:["Yuki Tsunoda","Red Bull Racing","#3671C6"], GAS:["Pierre Gasly","Alpine","#0093CC"],
         BEA:["Oliver Bearman","Haas","#B6BABD"], LAW:["Liam Lawson","Racing Bulls","#6692FF"]
       };
-      return [...state.demoCars].sort((a, b) => b.progress - a.progress).map((car, index) => {
+      const sorted = [...state.demoCars].sort((a, b) => b.progress - a.progress);
+      const leader = sorted[0];
+      return sorted.map((car, index) => {
         const data = teams[car.code] || [car.code, "--", "gray"];
-        return { position:index + 1, code:car.code, name:data[0], team:data[1], color:data[2], gap:index === 0 ? "Leader" : "+" + (index * 1.374 + (state.demoTick % 1)).toFixed(3) };
+        // FIX: gap base sur la difference de progression reelle + petite variation sinusoidale
+        let gap = "Leader";
+        if (index > 0) {
+          const baseDiff = (leader.progress - car.progress + 1) % 1;
+          // convertit la difference de progression en secondes (tour ~90s)
+          const secs = baseDiff * 90 + Math.sin(state.demoTick * 0.7 + index) * 0.15;
+          gap = "+" + secs.toFixed(3);
+        }
+        return { position: index + 1, code: car.code, name: data[0], team: data[1], color: data[2], gap };
       });
     }
 
@@ -585,10 +597,11 @@
     }
 
     async function loadTracks() {
+      // FIX: ne bloque pas si on a dejà le GeoJSON — mais on le recharge quand meme si null (retry apres erreur)
       if (state.tracksGeoJson) return;
       try {
         const data = await api("/api/tracks");
-        state.tracksGeoJson = data.geojson || null;
+        if (data.ok && data.geojson) state.tracksGeoJson = data.geojson;
       } catch {
         state.tracksGeoJson = null;
       }
@@ -661,7 +674,7 @@
     function renderStandings() {
       $("driversFull").innerHTML = state.standings.map(d => `
         <div class="standing-row" style="min-height:36px">
-          <span class="rank">${pad(d[0])}</span>
+          <span class="rank">${pos(d[0])}</span>
           <span class="team-dot ${dotClass(d[5])}" ${dotStyle(d[5])}></span>
           <span class="pilot">${d[2]}<small>${displayTeamName(d[3])} · ${d[1]}</small></span>
           <span class="pts">${d[4]} pts</span>
@@ -669,7 +682,7 @@
 
       $("constructorsFull").innerHTML = state.constructors.map(c => `
         <div class="standing-row" style="grid-template-columns:28px 7px 1fr auto;min-height:36px">
-          <span class="rank">${pad(c[0])}</span>
+          <span class="rank">${pos(c[0])}</span>
           <span class="team-dot ${dotClass(c[4])}" ${dotStyle(c[4])}></span>
           <span class="pilot">${displayTeamName(c[1])}<small>${c[2]}</small></span>
           <span class="pts">${c[3]} pts</span>
@@ -705,7 +718,7 @@
         const color = teamColor(constructor.name);
         return `
           <div class="standing-row" style="min-height:34px">
-            <span class="rank">${pad(r.position || "-")}</span>
+            <span class="rank">${pos(r.position || "-")}</span>
             <span class="team-dot ${dotClass(color)}" ${dotStyle(color)}></span>
             <span class="pilot">${driver.givenName || ""} ${driver.familyName || ""}<small>${displayTeamName(constructor.name)} · ${r.status || ""}</small></span>
             <span class="pts">${r.points || "0"}</span>
@@ -906,7 +919,10 @@
     function switchView(view) {
       document.querySelectorAll(".footer button").forEach(b => b.classList.toggle("active", b.dataset.view === view));
       document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
-      $(`view-${view}`).classList.add("active");
+      const el = $(`view-${view}`);
+      if (el) el.classList.add("active");
+      // FIX: re-render circuit quand on revient sur l'onglet (markers live/demo sinon figés)
+      if (view === "circuit") renderCircuit();
     }
 
     function bindNavigation() {
@@ -983,15 +999,21 @@
     function startTimers() {
       updateClock();
       setInterval(() => { updateClock(); updateCountdown(); }, 1000);
+
+      // FIX: pas de poll live si demo cars est actif (l'animation RAF s'en charge)
       setInterval(async () => {
         if (!state.syncOn || state.demoCarsOn) return;
         await loadLive();
-        renderAll();
+        renderRace();
+        renderApiStatus();
       }, 8000);
+
+      // Rechargement complet toutes les 20 min
       setInterval(() => {
-        if (state.syncOn) loadAll(false);
+        if (state.syncOn && !state.demoCarsOn) loadAll(false);
       }, 20 * 60 * 1000);
-      startDemoCarsAnimation();
+
+      if (state.demoCarsOn) startDemoCarsAnimation();
     }
 
     function boot() {
